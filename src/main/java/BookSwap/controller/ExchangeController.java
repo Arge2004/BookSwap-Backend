@@ -1,11 +1,14 @@
 package BookSwap.controller;
 
 import BookSwap.model.entity.Exchange;
+import BookSwap.model.entity.User;
 import BookSwap.service.IExchange;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping(path = "/api")
@@ -34,6 +37,12 @@ public class ExchangeController {
     @GetMapping(path = "exchanges")
     public List<Exchange> findAll(){
         return exchangeService.findAll();
+    }
+
+    @PatchMapping("exchange/{id}")
+    public ResponseEntity<Exchange> updatePartialUser(@PathVariable Integer id, @RequestBody Map<String, Object> updates) {
+        Exchange updatedExchange = exchangeService.updateExchangePartial(id, updates);
+        return ResponseEntity.ok(updatedExchange);
     }
 
 }

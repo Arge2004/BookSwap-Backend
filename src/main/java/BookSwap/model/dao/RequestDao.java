@@ -11,4 +11,5 @@ public interface RequestDao extends CrudRepository<Request, Integer> {
 
     List<Request> findByOfferedCopiesListContains(Copy copy);
     List<Request> findByRequestedCopiesListContains(Copy copy);
+    boolean existsByOfferedCopiesList_IdOrRequestedCopiesList_IdAndStatus_Active(Integer offeredCopyId, Integer requestedCopyId, boolean active);
 }
