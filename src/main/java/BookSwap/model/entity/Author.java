@@ -28,8 +28,7 @@ public class Author {
     @ManyToOne
     private Nacionality nacionality;
 
-    @Column(name = "description")
-    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "picture")

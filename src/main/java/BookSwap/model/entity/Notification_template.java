@@ -23,8 +23,7 @@ public class Notification_template {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @Column(name = "content")
-    @Lob
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
 
     @OneToMany(mappedBy = "notification_template", cascade = CascadeType.ALL)

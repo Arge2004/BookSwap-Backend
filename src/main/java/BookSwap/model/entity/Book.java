@@ -42,8 +42,7 @@ public class Book {
     @Column(name = "isbn")
     private String isbn;
 
-    @Column(name = "description")
-    @Lob
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
     @Column(name = "picture")
