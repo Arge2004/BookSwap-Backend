@@ -93,9 +93,13 @@ public class SecurityConfig {
                 })
                 .exceptionHandling(handling -> handling
                         .authenticationEntryPoint((request, response, authException) -> {
+                            System.out.println("=== SECURITY DEBUG ===");
+                            System.out.println("Request intercepted by Security");
+                            System.out.println("Session ID: " + request.getSession().getId());
+                            System.out.println("Cookies present: " + Arrays.toString(request.getCookies()));
+                            System.out.println("Exception: " + authException.getMessage());
+
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
-                            response.setHeader("Access-Control-Allow-Credentials", "true");
                             response.setContentType("application/json");
                             response.getWriter().write("{\"error\":\"Not authenticated\"}");
                         })
