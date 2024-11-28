@@ -36,10 +36,28 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "https://bookswap-app-782468de7a43.herokuapp.com"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("*"));
+
+        // En lugar de setAllowedOrigins, usa setAllowedOriginPatterns
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "http://localhost:5173",
+                "https://bookswap-app-782468de7a43.herokuapp.com"
+        ));
+
+        // Asegúrate de que esto esté antes de setAllowCredentials
         configuration.setAllowCredentials(true);
+
+        configuration.setAllowedMethods(Arrays.asList(
+                "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
+        ));
+
+        configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+        ));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -51,15 +69,12 @@ public class SecurityConfig {
         return http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(registry ->{
+                .authorizeHttpRequests(registry -> {
                     registry
-                            .requestMatchers("/api/**").permitAll()
-                            .requestMatchers(HttpMethod.POST, "/api/**").permitAll()  // Específica el método POST
-                            .requestMatchers(HttpMethod.GET, "/api/**").permitAll()
-                            .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
-                            .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
+                            .requestMatchers("/api/**").permitAll()  // Esta línea ya cubre todos los métodos HTTP para /api/**
                             .requestMatchers("/logout").permitAll()
                             .requestMatchers("/profile").permitAll()
+                            .requestMatchers("/oauth2/**", "/login/**").permitAll()  // Importante para OAuth2
                             .anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2login -> {
