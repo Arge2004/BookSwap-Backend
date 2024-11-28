@@ -29,31 +29,28 @@ public class LoginController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> profile(Authentication authentication) {
-        try {
-            if (authentication != null && authentication instanceof OAuth2AuthenticationToken) {
-                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
-                User user = new User();
-                user.setId(token.getPrincipal().getAttribute("sub"));
-                user.setUsername(token.getPrincipal().getAttribute("name"));
-                user.setEmail(token.getPrincipal().getAttribute("email"));
-                user.setPicture(token.getPrincipal().getAttribute("picture"));
+        System.out.println("Authentication: " + (authentication != null));  // Log para debug
 
-                return ResponseEntity.ok()
-                        .header("Access-Control-Allow-Origin", "http://localhost:5173")
-                        .header("Access-Control-Allow-Credentials", "true")
-                        .body(user);
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                        .header("Access-Control-Allow-Origin", "http://localhost:5173")
-                        .header("Access-Control-Allow-Credentials", "true")
-                        .body(Map.of("error", "No authenticated user"));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .header("Access-Control-Allow-Origin", "http://localhost:5173")
-                    .header("Access-Control-Allow-Credentials", "true")
-                    .body(Map.of("error", e.getMessage()));
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        if (authentication instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+            var principal = token.getPrincipal();
+
+            System.out.println("User attributes: " + principal.getAttributes());  // Log para debug
+
+            User user = new User();
+            user.setId(principal.getAttribute("sub"));
+            user.setUsername(principal.getAttribute("name"));
+            user.setEmail(principal.getAttribute("email"));
+            user.setPicture(principal.getAttribute("picture"));
+
+            return ResponseEntity.ok(user);
+        }
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
 
     @GetMapping("/logout")

@@ -12,6 +12,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
@@ -84,12 +85,25 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(registry -> {
                     registry
-                            .requestMatchers("/api/**").permitAll()  // Esta línea ya cubre todos los métodos HTTP para /api/**
-                            .requestMatchers("/logout").authenticated()
-                            .requestMatchers("/profile").authenticated()
-                            .requestMatchers("/oauth2/**", "/login/**").permitAll()  // Importante para OAuth2
+                            .requestMatchers("/api/**").permitAll()
+                            .requestMatchers("/oauth2/**", "/login/**").permitAll()
+                            .requestMatchers("/logout").permitAll()
+                            .requestMatchers("/profile").authenticated()  // Solo esto para /profile
                             .anyRequest().authenticated();
                 })
+                .exceptionHandling(handling -> handling
+                        .authenticationEntryPoint((request, response, authException) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                            response.setHeader("Access-Control-Allow-Credentials", "true");
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\":\"Not authenticated\"}");
+                        })
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                )
+
                 .oauth2Login(oauth2login -> {
                     oauth2login
                             .loginPage("http://localhost:5173/")
