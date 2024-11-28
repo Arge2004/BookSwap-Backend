@@ -3,6 +3,7 @@ package BookSwap.security;
 import BookSwap.model.entity.User;
 import BookSwap.service.IUser;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -142,10 +143,12 @@ public class SecurityConfig {
                                 response.setHeader("Access-Control-Allow-Credentials", "true");
                                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
-                                // Agregar log para depuración
-                                System.out.println("Login exitoso para usuario: " + authentication.getName());
-                                System.out.println("Session ID: " + request.getSession().getId());
-                                System.out.println("Cookies presentes: " + Arrays.toString(request.getCookies()));
+                                Cookie sessionCookie = new Cookie("JSESSIONID", request.getSession().getId());
+                                sessionCookie.setPath("/");
+                                sessionCookie.setSecure(true);
+                                sessionCookie.setHttpOnly(true);
+                                sessionCookie.setAttribute("SameSite", "None");
+                                response.addCookie(sessionCookie);
 
                                 response.sendRedirect("http://localhost:5173/homeLogged");
                             });
