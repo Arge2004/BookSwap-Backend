@@ -32,14 +32,20 @@ public class LoginController {
     @GetMapping("/profile")
     @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     public ResponseEntity<?> profile(Authentication authentication, HttpServletRequest request) {
-        // Imprimir información de depuración
-        System.out.println("Cookie JSESSIONID: " + Arrays.stream(request.getCookies())
-                .filter(c -> c.getName().equals("JSESSIONID"))
-                .findFirst()
-                .map(Cookie::getValue)
-                .orElse("No cookie found"));
+        // Usar System.out.println para asegurarnos que se vea en los logs de Heroku
+        System.out.println("=== DEBUG PROFILE ENDPOINT ===");
+        System.out.println("Request received at /profile");
 
-        System.out.println("Authentication present: " + (authentication != null));
+        Cookie[] cookies = request.getCookies();
+        System.out.println("Cookies: " + (cookies != null ? Arrays.toString(cookies) : "null"));
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                System.out.println("Cookie name: " + cookie.getName() + ", value: " + cookie.getValue());
+            }
+        }
+
+        System.out.println("Authentication: " + authentication);
 
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
