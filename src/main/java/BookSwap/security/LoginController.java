@@ -28,7 +28,7 @@ public class LoginController {
     }
 
     @GetMapping("/profile")
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     public User profile(OAuth2AuthenticationToken token, User user) {
         user.setId(token.getPrincipal().getAttribute("sub"));
         user.setUsername(token.getPrincipal().getAttribute("name"));
