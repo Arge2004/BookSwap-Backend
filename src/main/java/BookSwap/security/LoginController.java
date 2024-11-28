@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Map;
 
 @RestController
@@ -28,8 +29,11 @@ public class LoginController {
     }
 
     @GetMapping("/profile")
-    public ResponseEntity<?> profile(Authentication authentication) {
-        System.out.println("Authentication: " + (authentication != null));  // Log para debug
+    public ResponseEntity<?> profile(Authentication authentication, HttpServletRequest request) {
+        System.out.println("Profile endpoint called");
+        System.out.println("Session ID in profile: " + request.getSession().getId());
+        System.out.println("Authentication present: " + (authentication != null));
+        System.out.println("Cookies present: " + Arrays.toString(request.getCookies()));
 
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

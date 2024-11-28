@@ -101,7 +101,8 @@ public class SecurityConfig {
                         })
                 )
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                        .maximumSessions(1)
                 )
 
                 .oauth2Login(oauth2login -> {
@@ -138,8 +139,9 @@ public class SecurityConfig {
                                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
                                 // Agregar log para depuración
-                                System.out.println("Login exitoso para usuario: " + username);
+                                System.out.println("Login exitoso para usuario: " + authentication.getName());
                                 System.out.println("Session ID: " + request.getSession().getId());
+                                System.out.println("Cookies presentes: " + Arrays.toString(request.getCookies()));
 
                                 response.sendRedirect("http://localhost:5173/homeLogged");
                             });
