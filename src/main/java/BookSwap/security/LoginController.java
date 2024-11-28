@@ -28,17 +28,35 @@ public class LoginController {
     }
 
     @GetMapping("/profile")
-    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
-    public User profile(OAuth2AuthenticationToken token, User user) {
-        user.setId(token.getPrincipal().getAttribute("sub"));
-        user.setUsername(token.getPrincipal().getAttribute("name"));
-        user.setEmail(token.getPrincipal().getAttribute("email"));
-        user.setPicture(token.getPrincipal().getAttribute("picture"));
-        return user;
+    public ResponseEntity<?> profile(Authentication authentication) {
+        try {
+            if (authentication != null && authentication instanceof OAuth2AuthenticationToken) {
+                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+                User user = new User();
+                user.setId(token.getPrincipal().getAttribute("sub"));
+                user.setUsername(token.getPrincipal().getAttribute("name"));
+                user.setEmail(token.getPrincipal().getAttribute("email"));
+                user.setPicture(token.getPrincipal().getAttribute("picture"));
+
+                return ResponseEntity.ok()
+                        .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .body(user);
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                        .header("Access-Control-Allow-Credentials", "true")
+                        .body(Map.of("error", "No authenticated user"));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                    .header("Access-Control-Allow-Credentials", "true")
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/logout")
-    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     public ResponseEntity<?> logout(HttpServletRequest request, HttpServletResponse response) {
         try {
             // Obtener la autenticación actual
