@@ -37,27 +37,40 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // En lugar de setAllowedOrigins, usa setAllowedOriginPatterns
+        // Configura los orígenes permitidos
         configuration.setAllowedOriginPatterns(Arrays.asList(
-                "http://localhost:5173",
-                "https://bookswap-app-782468de7a43.herokuapp.com"
+                "http://localhost:5173"
         ));
 
-        // Asegúrate de que esto esté antes de setAllowCredentials
-        configuration.setAllowCredentials(true);
-
+        // Configura los métodos permitidos
         configuration.setAllowedMethods(Arrays.asList(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"
         ));
 
+        // Configura las cabeceras permitidas
         configuration.setAllowedHeaders(Arrays.asList(
                 "Authorization",
                 "Content-Type",
                 "Accept",
                 "Origin",
                 "Access-Control-Request-Method",
-                "Access-Control-Request-Headers"
+                "Access-Control-Request-Headers",
+                "X-Requested-With"
         ));
+
+        // Configura las cabeceras expuestas
+        configuration.setExposedHeaders(Arrays.asList(
+                "Set-Cookie",
+                "Access-Control-Allow-Origin",
+                "Access-Control-Allow-Credentials",
+                "X-XSRF-TOKEN"
+        ));
+
+        // Habilita las credenciales
+        configuration.setAllowCredentials(true);
+
+        // Tiempo de caché para las respuestas preflight
+        configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -72,46 +85,50 @@ public class SecurityConfig {
                 .authorizeHttpRequests(registry -> {
                     registry
                             .requestMatchers("/api/**").permitAll()  // Esta línea ya cubre todos los métodos HTTP para /api/**
-                            .requestMatchers("/logout").permitAll()
-                            .requestMatchers("/profile").permitAll()
+                            .requestMatchers("/logout").authenticated()
+                            .requestMatchers("/profile").authenticated()
                             .requestMatchers("/oauth2/**", "/login/**").permitAll()  // Importante para OAuth2
                             .anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2login -> {
                     oauth2login
                             .loginPage("http://localhost:5173/")
-                            .successHandler(new AuthenticationSuccessHandler() {
-                        @Override
-                        public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                            // Este bloque se ejecuta cuando el login es exitoso
-                            OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
+                            .successHandler((request, response, authentication) -> {
+                                // Este bloque se ejecuta cuando el login es exitoso
+                                OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
 
-                            String userId = token.getPrincipal().getAttribute("sub");
-                            String username = token.getPrincipal().getAttribute("name");
-                            String email = token.getPrincipal().getAttribute("email");
-                            String picture = token.getPrincipal().getAttribute("picture");
+                                String userId = token.getPrincipal().getAttribute("sub");
+                                String username = token.getPrincipal().getAttribute("name");
+                                String email = token.getPrincipal().getAttribute("email");
+                                String picture = token.getPrincipal().getAttribute("picture");
 
-                            // Verificar si el usuario ya existe
-                            User existingUser = userService.findById(userId);
-                            if (existingUser == null) {
-                                // Si no existe, crear un nuevo usuario
-                                User newUser = new User();
-                                newUser.setId(userId);
-                                newUser.setUsername(username);
-                                newUser.setEmail(email);
-                                newUser.setPicture(picture);
-                                userService.save(newUser); // Guardar el nuevo usuario
-                            } else {
-                                // Si ya existe, actualizar la información si es necesario
-                                existingUser.setUsername(username);
-                                existingUser.setEmail(email);
-                                existingUser.setPicture(picture);
-                                userService.save(existingUser); // Actualizar el usuario
-                            }
-                            response.sendRedirect("http://localhost:5173/homeLogged");
-                        }
+                                // Verificar si el usuario ya existe
+                                User existingUser = userService.findById(userId);
+                                if (existingUser == null) {
+                                    User newUser = new User();
+                                    newUser.setId(userId);
+                                    newUser.setUsername(username);
+                                    newUser.setEmail(email);
+                                    newUser.setPicture(picture);
+                                    userService.save(newUser);
+                                } else {
+                                    existingUser.setUsername(username);
+                                    existingUser.setEmail(email);
+                                    existingUser.setPicture(picture);
+                                    userService.save(existingUser);
+                                }
 
-                    });
+                                // Configurar cabeceras CORS antes de la redirección
+                                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                                response.setHeader("Access-Control-Allow-Credentials", "true");
+                                response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+                                // Agregar log para depuración
+                                System.out.println("Login exitoso para usuario: " + username);
+                                System.out.println("Session ID: " + request.getSession().getId());
+
+                                response.sendRedirect("http://localhost:5173/homeLogged");
+                            });
                 })
                 .logout(logout -> logout
                         .logoutUrl("/logout")
