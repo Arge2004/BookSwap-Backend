@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.Cookie;
 
 import java.security.Principal;
 import java.util.Arrays;
@@ -29,14 +30,22 @@ public class LoginController {
     }
 
     @GetMapping("/profile")
+    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
     public ResponseEntity<?> profile(Authentication authentication, HttpServletRequest request) {
-        System.out.println("Profile endpoint called");
-        System.out.println("Session ID in profile: " + request.getSession().getId());
+        // Imprimir información de depuración
+        System.out.println("Cookie JSESSIONID: " + Arrays.stream(request.getCookies())
+                .filter(c -> c.getName().equals("JSESSIONID"))
+                .findFirst()
+                .map(Cookie::getValue)
+                .orElse("No cookie found"));
+
         System.out.println("Authentication present: " + (authentication != null));
-        System.out.println("Cookies present: " + Arrays.toString(request.getCookies()));
 
         if (authentication == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                    .header("Access-Control-Allow-Credentials", "true")
+                    .body(Map.of("error", "No authentication found"));
         }
 
         if (authentication instanceof OAuth2AuthenticationToken) {
