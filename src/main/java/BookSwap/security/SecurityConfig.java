@@ -59,6 +59,7 @@ public class SecurityConfig {
                             .requestMatchers(HttpMethod.PUT, "/api/**").permitAll()
                             .requestMatchers(HttpMethod.DELETE, "/api/**").permitAll()
                             .requestMatchers("/logout").permitAll()
+                            .requestMatchers("/profile").permitAll()
                             .anyRequest().authenticated();
                 })
                 .oauth2Login(oauth2login -> {
