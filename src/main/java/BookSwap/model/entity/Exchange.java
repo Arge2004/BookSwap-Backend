@@ -32,7 +32,7 @@ public class Exchange {
     @Column(name = "requester_confirm", columnDefinition = "boolean")
     private boolean requester_confirm;
 
-    @Column(name = "askedFor_confirm", columnDefinition = "boolean")
+    @Column(name = "asked_for_confirm", columnDefinition = "boolean")
     private boolean askedFor_confirm;
 
     @JoinColumn(name = "id_status")
