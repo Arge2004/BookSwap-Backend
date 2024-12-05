@@ -41,6 +41,7 @@ public class User {
     private List<Copy> copiesList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnoreProperties(value="request")
     private List<Notification> notificationsList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
