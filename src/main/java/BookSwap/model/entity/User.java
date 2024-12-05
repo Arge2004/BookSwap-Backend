@@ -41,7 +41,6 @@ public class User {
     private List<Copy> copiesList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnore
     private List<Notification> notificationsList;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
