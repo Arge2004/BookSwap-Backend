@@ -44,8 +44,4 @@ public class User {
     @JsonIgnoreProperties(value="request, user")
     private List<Notification> notificationsList;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties(value="user")
-    private List<Notification> reviewsList;
-
 }
