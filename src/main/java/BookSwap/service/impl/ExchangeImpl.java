@@ -53,7 +53,7 @@ public class ExchangeImpl implements IExchange {
                 case "requester_confirm":
                     exchange.setRequester_confirm((Boolean) value);
                     break;
-                case "AskedFor_confirm":
+                case "askedFor_confirm":
                     exchange.setAskedFor_confirm((Boolean) value);
                     break;
                 default:

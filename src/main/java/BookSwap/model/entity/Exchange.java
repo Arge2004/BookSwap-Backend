@@ -33,7 +33,7 @@ public class Exchange {
     private boolean requester_confirm;
 
     @Column(name = "askedFor_confirm")
-    private boolean AskedFor_confirm;
+    private boolean askedFor_confirm;
 
     @JoinColumn(name = "id_status")
     @ManyToOne
