@@ -30,7 +30,6 @@ public class Notification {
     private Request request;
 
     @JoinColumn(name = "id_user")
-    @JsonIgnore
     @ManyToOne
     private User user;
 
