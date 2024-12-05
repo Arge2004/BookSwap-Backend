@@ -49,8 +49,4 @@ public class Request {
             inverseJoinColumns = @JoinColumn(name = "id_copy", referencedColumnName = "id")
     )
     private List<Copy> requestedCopiesList;
-
-    @OneToMany(mappedBy = "request", cascade = CascadeType.MERGE)
-    @JsonIgnore
-    private List<Notification> notificationsList;
 }

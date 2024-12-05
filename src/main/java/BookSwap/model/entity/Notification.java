@@ -29,7 +29,6 @@ public class Notification {
 
     @JoinColumn(name = "id_request")
     @ManyToOne
-    @JsonIgnoreProperties(value = {"notificationsList", "offeredCopiesList", "requestedCopiesList"})
     private Request request;
 
     @JoinColumn(name = "id_user")
