@@ -29,10 +29,10 @@ public class Exchange {
     @OneToOne
     private Request request;
 
-    @Column(name = "requester_confirm")
+    @Column(name = "requester_confirm", columnDefinition = "boolean")
     private boolean requester_confirm;
 
-    @Column(name = "askedFor_confirm")
+    @Column(name = "askedFor_confirm", columnDefinition = "boolean")
     private boolean askedFor_confirm;
 
     @JoinColumn(name = "id_status")
