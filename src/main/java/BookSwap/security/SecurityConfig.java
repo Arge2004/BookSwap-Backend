@@ -42,7 +42,7 @@ public class SecurityConfig {
         // Configura los orígenes permitidos
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "http://localhost:5173",
-                "https://arge2004.github.io"
+                "https://bookswaplatam.netlify.app"
         ));
 
         // Configura los métodos permitidos
