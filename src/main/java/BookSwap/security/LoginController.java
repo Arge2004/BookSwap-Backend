@@ -49,7 +49,7 @@ public class LoginController {
 
         if (authentication == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                    .header("Access-Control-Allow-Origin", "https://bookswaplatam.netlify.app")
                     .header("Access-Control-Allow-Credentials", "true")
                     .body(Map.of("error", "No authentication found"));
         }
@@ -93,7 +93,7 @@ public class LoginController {
             }
 
             return ResponseEntity.ok()
-                    .header("Access-Control-Allow-Origin", "http://localhost:5173")
+                    .header("Access-Control-Allow-Origin", "https://bookswaplatam.netlify.app")
                     .header("Access-Control-Allow-Credentials", "true")
                     .body(Map.of("message", "Logout successful"));
 
