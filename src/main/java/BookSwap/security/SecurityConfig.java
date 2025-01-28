@@ -113,7 +113,7 @@ public class SecurityConfig {
 
                 .oauth2Login(oauth2login -> {
                     oauth2login
-                            .loginPage("http://localhost:5173/")
+                            .loginPage("https://bookswaplatam.netlify.app/")
                             .successHandler((request, response, authentication) -> {
                                 // Este bloque se ejecuta cuando el login es exitoso
                                 OAuth2AuthenticationToken token = (OAuth2AuthenticationToken) authentication;
@@ -151,7 +151,7 @@ public class SecurityConfig {
                                 sessionCookie.setAttribute("SameSite", "None");
                                 response.addCookie(sessionCookie);
 
-                                response.sendRedirect("http://localhost:5173/homeLogged");
+                                response.sendRedirect("https://bookswaplatam.netlify.app/homeLogged");
                             });
                 })
                 .logout(logout -> logout
