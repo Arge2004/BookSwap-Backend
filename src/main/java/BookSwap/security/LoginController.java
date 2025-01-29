@@ -30,7 +30,7 @@ public class LoginController {
     }
 
     @GetMapping("/profile")
-    @CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
+    @CrossOrigin(origins = {"http://localhost:5173","https://bookswaplatam.netlify.app"}, allowCredentials = "true")
     public ResponseEntity<?> profile(Authentication authentication, HttpServletRequest request) {
         // Usar System.out.println para asegurarnos que se vea en los logs de Heroku
         System.out.println("=== DEBUG PROFILE ENDPOINT ===");

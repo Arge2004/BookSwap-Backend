@@ -62,7 +62,6 @@ public class RequestImpl implements IRequest {
         for (Copy copy : userCopies) {
             // Agregar solicitudes de copias ofrecidas y solicitadas
             requests.addAll(requestDao.findByOfferedCopiesListContains(copy));
-            requests.addAll(requestDao.findByRequestedCopiesListContains(copy));
         }
 
         // Eliminar duplicados si la misma solicitud aparece dos veces
