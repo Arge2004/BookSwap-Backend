@@ -140,7 +140,7 @@ public class SecurityConfig {
                                 }
 
                                 // Configurar cabeceras CORS antes de la redirección
-                                response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                                response.setHeader("Access-Control-Allow-Origin", "https://bookswaplatam.netlify.app");
                                 response.setHeader("Access-Control-Allow-Credentials", "true");
                                 response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 
@@ -160,7 +160,7 @@ public class SecurityConfig {
                             response.setStatus(HttpServletResponse.SC_OK);
                             response.getWriter().write("{\"message\":\"Logout successful\"}");
                             response.setHeader("Content-Type", "application/json");
-                            response.setHeader("Access-Control-Allow-Origin", "http://localhost:5173");
+                            response.setHeader("Access-Control-Allow-Origin", "https://bookswaplatam.netlify.app");
                             response.setHeader("Access-Control-Allow-Credentials", "true");
                         })
                         .clearAuthentication(true)
