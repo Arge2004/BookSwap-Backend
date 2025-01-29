@@ -24,7 +24,7 @@ import java.util.Map;
 public class LoginController {
 
     @RequestMapping("/user")
-    @CrossOrigin(origins = "http://localhost:5173")
+    @CrossOrigin(origins = {"http://localhost:5173","https://bookswaplatam.netlify.app"})
     public Principal user(Principal user){
         return user;
     }
