@@ -1,5 +1,6 @@
 package BookSwap.service.impl;
 
+import BookSwap.emailService.EmailService;
 import BookSwap.model.dao.ExchangeDao;
 import BookSwap.model.dao.UsageDao;
 import BookSwap.model.entity.Exchange;
@@ -19,9 +20,25 @@ public class ExchangeImpl implements IExchange {
     @Autowired
     private ExchangeDao exchangeDao;
 
+    @Autowired
+    private EmailService emailService;
+
     @Transactional
     public Exchange save(Exchange exchange) {
-        return exchangeDao.save(exchange);
+        Exchange savedExchange = exchangeDao.save(exchange);
+
+        // Obtener info del usuario que hizo la solicitud
+
+        String requesterEmail = savedExchange.getRequest().getRequestedCopiesList().get(0).getUser().getEmail();
+
+        // Obtener info del usuario al que se le hizo la solicitud
+        String userEmail = savedExchange.getRequest().getOfferedCopiesList().get(0).getUser().getEmail();
+        String userName = savedExchange.getRequest().getOfferedCopiesList().get(0).getUser().getUsername();
+
+        // Enviar correo de notificación
+        emailService.sendExchangeNotification(requesterEmail, userName, userEmail);
+
+        return savedExchange;
     }
 
     @Transactional(readOnly = true)
