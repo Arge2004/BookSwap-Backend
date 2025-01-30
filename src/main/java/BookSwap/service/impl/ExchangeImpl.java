@@ -37,11 +37,11 @@ public class ExchangeImpl implements IExchange {
 
         // Obtener info del usuario que hizo la solicitud
 
-        String requesterEmail = request.getRequestedCopiesList().get(0).getUser().getEmail();
+        String requesterEmail = request.getOfferedCopiesList().get(0).getUser().getEmail();
 
         // Obtener info del usuario al que se le hizo la solicitud
-        String userEmail = request.getOfferedCopiesList().get(0).getUser().getEmail();
-        String userName = request.getOfferedCopiesList().get(0).getUser().getUsername();
+        String userEmail = request.getRequestedCopiesList().get(0).getUser().getEmail();
+        String userName = request.getRequestedCopiesList().get(0).getUser().getUsername();
 
         // Enviar correo de notificación
         emailService.sendExchangeNotification(requesterEmail, userName, userEmail);
