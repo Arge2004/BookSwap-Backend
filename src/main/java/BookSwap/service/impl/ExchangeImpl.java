@@ -4,11 +4,13 @@ import BookSwap.emailService.EmailService;
 import BookSwap.model.dao.ExchangeDao;
 import BookSwap.model.dao.UsageDao;
 import BookSwap.model.entity.Exchange;
+import BookSwap.model.entity.Request;
 import BookSwap.model.entity.Usage;
 import BookSwap.service.IExchange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import BookSwap.model.dao.RequestDao;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,21 +23,25 @@ public class ExchangeImpl implements IExchange {
     private ExchangeDao exchangeDao;
 
     @Autowired
+    private RequestDao requestDao;
+
+    @Autowired
     private EmailService emailService;
 
     @Transactional
     public Exchange save(Exchange exchange) {
         Exchange savedExchange = exchangeDao.save(exchange);
 
-        System.out.println(savedExchange.getRequest());
+        Request request = requestDao.findById(exchange.getRequest().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Request not found"));
 
         // Obtener info del usuario que hizo la solicitud
 
-        String requesterEmail = savedExchange.getRequest().getRequestedCopiesList().get(0).getUser().getEmail();
+        String requesterEmail = request.getRequestedCopiesList().get(0).getUser().getEmail();
 
         // Obtener info del usuario al que se le hizo la solicitud
-        String userEmail = savedExchange.getRequest().getOfferedCopiesList().get(0).getUser().getEmail();
-        String userName = savedExchange.getRequest().getOfferedCopiesList().get(0).getUser().getUsername();
+        String userEmail = request.getOfferedCopiesList().get(0).getUser().getEmail();
+        String userName = request.getOfferedCopiesList().get(0).getUser().getUsername();
 
         // Enviar correo de notificación
         emailService.sendExchangeNotification(requesterEmail, userName, userEmail);
