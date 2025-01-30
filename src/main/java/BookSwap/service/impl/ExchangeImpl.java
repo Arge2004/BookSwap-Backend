@@ -30,7 +30,7 @@ public class ExchangeImpl implements IExchange {
     private EmailService emailService;
 
     @Transactional
-    public Exchange save(Exchange exchange) throws MessagingException {
+    public Exchange save(Exchange exchange) {
         Exchange savedExchange = exchangeDao.save(exchange);
 
         Request request = requestDao.findById(exchange.getRequest().getId())
@@ -45,7 +45,12 @@ public class ExchangeImpl implements IExchange {
         String userName = request.getRequestedCopiesList().get(0).getUser().getUsername();
 
         // Enviar correo de notificación
-        emailService.sendExchangeAcceptedNotification(requesterEmail, userName, userEmail);
+        try{
+            emailService.sendExchangeAcceptedNotification(requesterEmail, userName, userEmail);
+        }
+        catch (MessagingException e){
+            System.out.println("Error sending email: " + e.getMessage());
+        }
 
         return savedExchange;
     }
