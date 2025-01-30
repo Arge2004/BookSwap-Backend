@@ -7,6 +7,7 @@ import BookSwap.model.entity.Exchange;
 import BookSwap.model.entity.Request;
 import BookSwap.model.entity.Usage;
 import BookSwap.service.IExchange;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +30,7 @@ public class ExchangeImpl implements IExchange {
     private EmailService emailService;
 
     @Transactional
-    public Exchange save(Exchange exchange) {
+    public Exchange save(Exchange exchange) throws MessagingException {
         Exchange savedExchange = exchangeDao.save(exchange);
 
         Request request = requestDao.findById(exchange.getRequest().getId())
@@ -44,7 +45,7 @@ public class ExchangeImpl implements IExchange {
         String userName = request.getRequestedCopiesList().get(0).getUser().getUsername();
 
         // Enviar correo de notificación
-        emailService.sendExchangeNotification(requesterEmail, userName, userEmail);
+        emailService.sendExchangeAcceptedNotification(requesterEmail, userName, userEmail);
 
         return savedExchange;
     }
