@@ -27,6 +27,8 @@ public class ExchangeImpl implements IExchange {
     public Exchange save(Exchange exchange) {
         Exchange savedExchange = exchangeDao.save(exchange);
 
+        System.out.println(savedExchange.getRequest());
+
         // Obtener info del usuario que hizo la solicitud
 
         String requesterEmail = savedExchange.getRequest().getRequestedCopiesList().get(0).getUser().getEmail();
