@@ -38,7 +38,7 @@ public class RequestImpl implements IRequest {
         Request savedRequest = requestDao.save(request);
 
         // Obtener request original
-        Request requestOriginal = requestDao.findById(savedRequest.getId())
+        Request requestOriginal = requestDao.findById(request.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
 
         // Verificar que las listas no estén vacías
