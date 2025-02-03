@@ -37,10 +37,18 @@ public class RequestImpl implements IRequest {
     public Request save(Request request) {
         Request savedRequest = requestDao.save(request);
 
-        User userRequested = userDao.findById(request.getRequestedCopiesList().get(0).getUser().getId())
+        // Obtener request original
+        Request requestOriginal = requestDao.findById(savedRequest.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
+        // Obtener info del usuario que hizo la solicitud
+
+        User userOffered = userDao.findById(requestOriginal.getOfferedCopiesList().get(0).getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
-        User userOffered = userDao.findById(request.getOfferedCopiesList().get(0).getUser().getId())
+        // Obtener info del usuario al que se le hizo la solicitud
+
+        User userRequested = userDao.findById(requestOriginal.getRequestedCopiesList().get(0).getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Enviar correo de notificación
