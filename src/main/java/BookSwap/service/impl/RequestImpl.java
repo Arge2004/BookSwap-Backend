@@ -1,6 +1,7 @@
 package BookSwap.service.impl;
 
 import BookSwap.emailService.EmailService;
+import BookSwap.model.dao.CopyDao;
 import BookSwap.model.dao.RequestDao;
 import BookSwap.model.dao.StatusDao;
 import BookSwap.model.dao.UserDao;
@@ -32,6 +33,8 @@ public class RequestImpl implements IRequest {
     private EmailService emailService;
     @Autowired
     private StatusDao statusDao;
+    @Autowired
+    private CopyDao copyDao;
 
     @Transactional
     public Request save(Request request) {
@@ -39,18 +42,22 @@ public class RequestImpl implements IRequest {
 
         System.out.println("Request saved: " + savedRequest.getId());
 
-        // Obtener request original
-        Request requestOriginal = requestDao.findById(savedRequest.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
+
 
         // Obtener info del usuario que hizo la solicitud
 
-        User userOffered = userDao.findById(requestOriginal.getOfferedCopiesList().get(0).getUser().getId())
+        Copy offeredCopy = copyDao.findById(request.getOfferedCopiesList().get(0).getId())
+                .orElseThrow(() -> new IllegalArgumentException("Copia ofrecida no encontrada"));
+
+        User userOffered = userDao.findById(offeredCopy.getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Obtener info del usuario al que se le hizo la solicitud
 
-        User userRequested = userDao.findById(requestOriginal.getRequestedCopiesList().get(0).getUser().getId())
+        Copy requestedCopy = copyDao.findById(request.getRequestedCopiesList().get(0).getId())
+                .orElseThrow(() -> new IllegalArgumentException("Copia solicitada no encontrada"));
+
+        User userRequested = userDao.findById(requestedCopy.getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Enviar correo de notificación
