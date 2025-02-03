@@ -32,7 +32,7 @@ public class EmailService {
         String content = "<div style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<h2 style='color: #e67e22;'>Tienes un intercambio pendiente</h2>"
                 + "<p><strong>" + requesterName + "</strong> quiere hacer un intercambio contigo.</p>"
-                + "<p>Puedes <a href='https://bookswap.com/mis-intercambios'>aceptar o rechazar</a> la solicitud.</p>"
+                + "<p>Puedes <a href='https://bookswaplatam.netlify.app/myRequest'>aceptar o rechazar</a> la solicitud.</p>"
                 + "<br><p>¡Gracias por usar BookSwap!</p></div>";
 
         sendHtmlEmail(to, subject, content);
@@ -43,7 +43,7 @@ public class EmailService {
         String content = "<div style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<h2 style='color: #c0392b;'>Solicitud rechazada</h2>"
                 + "<p>Lamentamos informarte que tu solicitud de intercambio realizada a <strong>'" + userRequired + "'</strong> ha sido rechazada.</p>"
-                + "<p>Puedes buscar otro libro disponible en <a href='https://bookswap.com'>BookSwap</a>.</p>"
+                + "<p>Puedes buscar otro libro disponible en <a href='https://bookswaplatam.netlify.app'>BookSwap</a>.</p>"
                 + "<br><p>¡Gracias por usar BookSwap!</p></div>";
 
         sendHtmlEmail(to, subject, content);
