@@ -11,6 +11,7 @@ import BookSwap.model.entity.User;
 import BookSwap.service.IRequest;
 import io.swagger.v3.core.util.ReflectionUtils;
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,13 +33,18 @@ public class RequestImpl implements IRequest {
     private EmailService emailService;
     @Autowired
     private StatusDao statusDao;
+    @Autowired
+    private EntityManager entityManager; // Asegura que tengas EntityManager inyectado
 
     @Transactional
     public Request save(Request request) {
         Request savedRequest = requestDao.save(request);
 
-        // Obtener request original
-        Request requestOriginal = requestDao.findById(request.getId())
+        // Refrescar la entidad para asegurarnos de que las relaciones estén actualizadas
+        entityManager.refresh(savedRequest);
+
+        // Obtener request original con las relaciones cargadas
+        Request requestOriginal = requestDao.findById(savedRequest.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
 
         // Verificar que las listas no estén vacías
@@ -74,6 +80,7 @@ public class RequestImpl implements IRequest {
 
         return savedRequest;
     }
+
 
 
     @Transactional(readOnly = true)
