@@ -27,22 +27,22 @@ public class EmailService {
         sendHtmlEmail(to, subject, content);
     }
 
-    public void sendExchangePendingNotification(String to, String requesterName, String bookTitle) throws MessagingException {
+    public void sendExchangePendingNotification(String to, String requesterName) throws MessagingException {
         String subject = "Tienes una solicitud de intercambio pendiente";
         String content = "<div style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<h2 style='color: #e67e22;'>Tienes un intercambio pendiente</h2>"
-                + "<p><strong>" + requesterName + "</strong> quiere intercambiar el libro <strong>'" + bookTitle + "'</strong> contigo.</p>"
+                + "<p><strong>" + requesterName + "</strong> quiere hacer un intercambio contigo.</p>"
                 + "<p>Puedes <a href='https://bookswap.com/mis-intercambios'>aceptar o rechazar</a> la solicitud.</p>"
                 + "<br><p>¡Gracias por usar BookSwap!</p></div>";
 
         sendHtmlEmail(to, subject, content);
     }
 
-    public void sendExchangeRejectedNotification(String to, String bookTitle) throws MessagingException {
+    public void sendExchangeRejectedNotification(String to, String userRequired) throws MessagingException {
         String subject = "Tu solicitud de intercambio ha sido rechazada";
         String content = "<div style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<h2 style='color: #c0392b;'>Solicitud rechazada</h2>"
-                + "<p>Lamentamos informarte que tu solicitud de intercambio por el libro <strong>'" + bookTitle + "'</strong> ha sido rechazada.</p>"
+                + "<p>Lamentamos informarte que tu solicitud de intercambio realizada a <strong>'" + userRequired + "'</strong> ha sido rechazada.</p>"
                 + "<p>Puedes buscar otro libro disponible en <a href='https://bookswap.com'>BookSwap</a>.</p>"
                 + "<br><p>¡Gracias por usar BookSwap!</p></div>";
 

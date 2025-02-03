@@ -1,6 +1,8 @@
 package BookSwap.service.impl;
 
+import BookSwap.emailService.EmailService;
 import BookSwap.model.dao.RequestDao;
+import BookSwap.model.dao.StatusDao;
 import BookSwap.model.dao.UserDao;
 import BookSwap.model.entity.Copy;
 import BookSwap.model.entity.Request;
@@ -8,6 +10,7 @@ import BookSwap.model.entity.Status;
 import BookSwap.model.entity.User;
 import BookSwap.service.IRequest;
 import io.swagger.v3.core.util.ReflectionUtils;
+import jakarta.mail.MessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,10 +28,30 @@ public class RequestImpl implements IRequest {
     private RequestDao requestDao;
     @Autowired
     private UserDao userDao;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private StatusDao statusDao;
 
     @Transactional
     public Request save(Request request) {
-        return requestDao.save(request);
+        Request savedRequest = requestDao.save(request);
+
+        User userRequested = userDao.findById(request.getRequestedCopiesList().get(0).getUser().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        User userOffered = userDao.findById(request.getOfferedCopiesList().get(0).getUser().getId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
+
+        // Enviar correo de notificación
+        try{
+            emailService.sendExchangePendingNotification(userRequested.getEmail(), userOffered.getUsername());
+        }
+        catch (MessagingException e){
+            System.out.println("Error sending email: " + e.getMessage());
+        }
+
+        return savedRequest;
     }
 
     @Transactional(readOnly = true)
@@ -88,8 +111,27 @@ public class RequestImpl implements IRequest {
                         Map<String, Object> statusMap = (Map<String, Object>) value;
                         if (statusMap.containsKey("id")) {
                             Integer statusId = (Integer) statusMap.get("id");
-                            Status newStatus = new Status();
-                            newStatus.setId(statusId);
+
+                            // Buscar el status en la base de datos
+                            Status newStatus = statusDao.findById(statusId)
+                                    .orElseThrow(() -> new IllegalArgumentException("Status no encontrado con ID: " + statusId));
+
+                            // Acción si el status es 3
+                            if (newStatus.getId() == 3) {
+                                // Obtener info del usuario que hizo la solicitud
+                                String requesterEmail = request.getOfferedCopiesList().get(0).getUser().getEmail();
+
+                                // Obtener info del usuario al que se le hizo la solicitud
+                                String userName = request.getRequestedCopiesList().get(0).getUser().getUsername();
+
+                                // Enviar correo de notificación
+                                try {
+                                    emailService.sendExchangeRejectedNotification(requesterEmail, userName);
+                                } catch (MessagingException e) {
+                                    System.out.println("Error sending email: " + e.getMessage());
+                                }
+                            }
+
                             request.setStatus(newStatus);
                         }
                     }
