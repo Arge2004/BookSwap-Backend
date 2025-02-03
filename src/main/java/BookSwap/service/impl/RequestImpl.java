@@ -11,7 +11,6 @@ import BookSwap.model.entity.User;
 import BookSwap.service.IRequest;
 import io.swagger.v3.core.util.ReflectionUtils;
 import jakarta.mail.MessagingException;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,55 +32,37 @@ public class RequestImpl implements IRequest {
     private EmailService emailService;
     @Autowired
     private StatusDao statusDao;
-    @Autowired
-    private EntityManager entityManager; // Asegura que tengas EntityManager inyectado
 
     @Transactional
     public Request save(Request request) {
         Request savedRequest = requestDao.save(request);
 
-        // Refrescar la entidad para asegurarnos de que las relaciones estén actualizadas
-        entityManager.refresh(savedRequest);
+        System.out.println("Request saved: " + savedRequest.getId());
 
-        // Obtener request original con las relaciones cargadas
+        // Obtener request original
         Request requestOriginal = requestDao.findById(savedRequest.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Solicitud no encontrada"));
 
-        // Verificar que las listas no estén vacías
-        if (requestOriginal.getOfferedCopiesList().isEmpty()) {
-            throw new IllegalArgumentException("No hay copias ofrecidas en la solicitud");
-        }
-        if (requestOriginal.getRequestedCopiesList().isEmpty()) {
-            throw new IllegalArgumentException("No hay copias solicitadas en la solicitud");
-        }
-
         // Obtener info del usuario que hizo la solicitud
-        Copy offeredCopy = requestOriginal.getOfferedCopiesList().get(0);
-        if (offeredCopy.getUser() == null) {
-            throw new IllegalArgumentException("La copia ofrecida no tiene un usuario asociado");
-        }
-        User userOffered = userDao.findById(offeredCopy.getUser().getId())
+
+        User userOffered = userDao.findById(requestOriginal.getOfferedCopiesList().get(0).getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Obtener info del usuario al que se le hizo la solicitud
-        Copy requestedCopy = requestOriginal.getRequestedCopiesList().get(0);
-        if (requestedCopy.getUser() == null) {
-            throw new IllegalArgumentException("La copia solicitada no tiene un usuario asociado");
-        }
-        User userRequested = userDao.findById(requestedCopy.getUser().getId())
+
+        User userRequested = userDao.findById(requestOriginal.getRequestedCopiesList().get(0).getUser().getId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado"));
 
         // Enviar correo de notificación
-        try {
+        try{
             emailService.sendExchangePendingNotification(userRequested.getEmail(), userOffered.getUsername());
-        } catch (MessagingException e) {
+        }
+        catch (MessagingException e){
             System.out.println("Error sending email: " + e.getMessage());
         }
 
         return savedRequest;
     }
-
-
 
     @Transactional(readOnly = true)
     public Request findById(Integer id) {
